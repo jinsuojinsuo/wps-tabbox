@@ -80,6 +80,36 @@
         }
     }
 
+    function time(timestamp, unit) {
+        if (typeof timestamp === "string") {
+            timestamp = timestamp.trim();
+            if (!/^[+-]?\d+$/.test(timestamp)) throw new Error("时间戳必须是整数或整数字符串");
+            timestamp = Number(timestamp);
+        }
+        if (typeof timestamp !== "number" || !Number.isSafeInteger(timestamp)) {
+            throw new Error("时间戳必须是安全整数或整数字符串");
+        }
+        if (unit === undefined || unit === null || unit === "") unit = "s";
+        if (unit !== "s" && unit !== "ms") throw new Error('时间戳单位只支持 "s" 或 "ms"');
+
+        // 固定 UTC+8，再用 UTC 格式化，避免电脑时区及历史夏令时影响结果。
+        var milliseconds = unit === "ms" ? timestamp : timestamp * 1000;
+        var date = new Date(milliseconds + 8 * 60 * 60 * 1000);
+        var year = date.getUTCFullYear();
+        if (!Number.isFinite(year) || year < 1 || year > 9999) {
+            throw new Error("转换后的北京时间超出 0001–9999 年范围");
+        }
+        return date.toISOString().slice(0, 19).replace("T", " ");
+    }
+
+    function timeFormula(timestamp, unit) {
+        try {
+            return time(timestamp, unit);
+        } catch (error) {
+            return "#TIME! " + error.message;
+        }
+    }
+
     var metadata = {
         "name": "GET",
         "description": "从 JSON 文本中提取字段，支持 user.name、items[0].id 和双引号括号字段名。",
@@ -99,7 +129,29 @@
             "type": "any"
         }
     };
-    var api = { get: get, formula: formula, metadata: metadata };
+    var timeMetadata = {
+        "name": "TIME",
+        "description": "将 Unix 时间戳转换为北京时间 yyyy-MM-dd HH:mm:ss 文本。",
+        "parameters": [
+            {
+                "name": "timestamp",
+                "description": "整数时间戳，支持数值或整数字符串",
+                "type": "any"
+            },
+            {
+                "name": "unit",
+                "description": "可省略，默认 s（秒）；ms 表示毫秒",
+                "type": "string?"
+            }
+        ],
+        "result": {
+            "type": "string"
+        }
+    };
+    var api = {
+        get: get, formula: formula, metadata: metadata,
+        time: time, timeFormula: timeFormula, timeMetadata: timeMetadata
+    };
     if (typeof module === "object" && module.exports) {
         module.exports = api;
     } else {

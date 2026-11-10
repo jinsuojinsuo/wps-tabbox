@@ -3,12 +3,12 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
-const { metadata } = require("../js/functions.js");
+const { metadata, timeMetadata } = require("../js/functions.js");
 
 const root = path.resolve(__dirname, "..");
 const output = path.join(root, "dist");
 const declaration = JSON.parse(fs.readFileSync(path.join(root, "functions.json"), "utf8"));
-assert.deepEqual(declaration.functions, [metadata], "functions.json 与注册函数声明不一致");
+assert.deepEqual(declaration.functions, [metadata, timeMetadata], "functions.json 与注册函数声明不一致");
 
 const files = ["index.html", "main.js", "manifest.xml", "ribbon.xml", "functions.json", "js/functions.js"];
 fs.mkdirSync(output, { recursive: true });

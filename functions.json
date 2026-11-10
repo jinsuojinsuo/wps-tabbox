@@ -18,6 +18,25 @@
       "result": {
         "type": "any"
       }
+    },
+    {
+      "name": "TIME",
+      "description": "将 Unix 时间戳转换为北京时间 yyyy-MM-dd HH:mm:ss 文本。",
+      "parameters": [
+        {
+          "name": "timestamp",
+          "description": "整数时间戳，支持数值或整数字符串",
+          "type": "any"
+        },
+        {
+          "name": "unit",
+          "description": "可省略，默认 s（秒）；ms 表示毫秒",
+          "type": "string?"
+        }
+      ],
+      "result": {
+        "type": "string"
+      }
     }
   ]
 }

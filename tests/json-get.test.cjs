@@ -56,7 +56,7 @@ test("长编号不静默舍入，合法长整数以文本交给表格", () => {
 
 test("WPS 声明与注册保持一致，宿主加载回调重复触发不会重复注册", () => {
     const metadata = JSON.parse(fs.readFileSync(path.join(__dirname, "../functions.json"), "utf8"));
-    assert.deepEqual(metadata.functions, [json.metadata]);
+    assert.deepEqual(metadata.functions, [json.metadata, json.timeMetadata]);
     const calls = [];
     const context = {
         WpsJson: json,
@@ -67,7 +67,7 @@ test("WPS 声明与注册保持一致，宿主加载回调重复触发不会重�
     vm.runInContext(fs.readFileSync(path.join(__dirname, "../main.js"), "utf8"), context);
     context.OnAddinLoad();
     context.OnAddinLoad();
-    assert.equal(calls.length, 1);
+    assert.equal(calls.length, 2);
     assert.equal(calls[0][0], "JSON");
     assert.equal(calls[0][1], "GET");
     assert.equal(calls[0][2]('{"uid":123}', "uid"), 123);
