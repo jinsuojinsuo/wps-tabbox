@@ -17,11 +17,11 @@ function registerJsonFunction() {
             var entry = functions[i];
             var name = entry.metadata.name;
             if (JsonRegisteredFunctions[name]) continue;
-            var result = api.AddCustomFunction("JSON", name, entry.formula, entry.metadata);
-            if (result === false) throw new Error("WPS 未接受 JSON." + name + " 注册");
+            var result = api.AddCustomFunction("TABBOX", name, entry.formula, entry.metadata);
+            if (result === false) throw new Error("WPS 未接受 TABBOX." + name + " 注册");
             JsonRegisteredFunctions[name] = true;
         }
-        JsonAddinStatus = { ok: true, message: "已提交 JSON.GET 和 JSON.TIME 注册，请在单元格中验证" };
+        JsonAddinStatus = { ok: true, message: "已提交 TABBOX.JSONGET 和 TABBOX.TIME 注册，请在单元格中验证" };
     } catch (error) {
         JsonAddinStatus = { ok: false, message: error.message };
     }
@@ -34,7 +34,7 @@ function OnAddinLoad() {
 
 function OnJsonStatus() {
     registerJsonFunction();
-    alert(JsonAddinStatus.message + "\n提取字段：=JSON.GET(A2,\"user.name\")\n时间戳转换：=JSON.TIME(A2)");
+    alert(JsonAddinStatus.message + "\n提取字段：=TABBOX.JSONGET(A2,\"user.name\")\n时间戳转换：=TABBOX.TIME(A2)");
 }
 
 registerJsonFunction();

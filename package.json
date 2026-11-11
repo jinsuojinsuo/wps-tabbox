@@ -2,7 +2,7 @@
   "name": "wps-json-get",
   "version": "1.0.0",
   "private": true,
-  "description": "WPS 表格本地 JSON 字段提取加载项",
+  "description": "TABBOX · WPS 表格工具箱",
   "addonType": "et",
   "engines": {
     "node": ">=18"

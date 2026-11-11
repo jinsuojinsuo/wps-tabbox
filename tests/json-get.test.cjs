@@ -68,10 +68,12 @@ test("WPS 声明与注册保持一致，宿主加载回调重复触发不会重�
     context.OnAddinLoad();
     context.OnAddinLoad();
     assert.equal(calls.length, 2);
-    assert.equal(calls[0][0], "JSON");
-    assert.equal(calls[0][1], "GET");
+    assert.equal(calls[0][0], "TABBOX");
+    assert.equal(calls[0][1], "JSONGET");
     assert.equal(calls[0][2]('{"uid":123}', "uid"), 123);
     assert.deepEqual(calls[0][3], json.metadata);
+    const manifest = fs.readFileSync(path.join(__dirname, "../manifest.xml"), "utf8");
+    assert.match(manifest, /<Namespace>TABBOX<\/Namespace>/);
 });
 
 test("缺少宿主 API 时报告不兼容，延迟出现的 API 允许重试注册", () => {

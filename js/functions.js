@@ -111,7 +111,7 @@
     }
 
     var metadata = {
-        "name": "GET",
+        "name": "JSONGET",
         "description": "从 JSON 文本中提取字段，支持 user.name、items[0].id 和双引号括号字段名。",
         "parameters": [
             {

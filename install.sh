@@ -62,10 +62,10 @@ main() {
         printf '正在从 GitHub 下载运行文件……\n'
         /usr/bin/curl --fail --show-error --silent --location --retry 2 \
             --connect-timeout 15 --max-time 120 \
-            'https://codeload.github.com/jinsuojinsuo/wps-json-get/zip/refs/heads/main' \
+            'https://codeload.github.com/jinsuojinsuo/wps-tabbox/zip/refs/heads/main' \
             --output "$work_dir/source.zip" || fail "下载失败，请检查网络后重试。"
         /usr/bin/ditto -x -k "$work_dir/source.zip" "$work_dir/source" || fail "下载的压缩包无法解压。"
-        source_dir="$work_dir/source/wps-json-get-main"
+        source_dir="$work_dir/source/wps-tabbox-main"
     fi
 
     runtime_files=(index.html main.js manifest.xml functions.json ribbon.xml js/functions.js)
@@ -141,7 +141,7 @@ XSL
     printf '安装文件和配置已写入：%s\n' "$install_dir"
     [[ -z "$backup_dir" ]] || printf '原配置和同版本旧文件已备份到：%s\n' "$backup_dir"
     printf '无需 Git、Node.js、npm、Python 或编译环境，也无需常驻服务。\n'
-    printf '请重新打开 WPS 表格，验证公式：=JSON.GET("[10,20,30]","[0]")，预期返回 10。\n'
+    printf '请重新打开 WPS 表格，验证公式：=TABBOX.JSONGET("[10,20,30]","[0]")，预期返回 10。\n'
     printf '文件安装完成不代表当前 WPS 客户端已支持自定义函数，仍需以上实际验证。\n'
 }
 

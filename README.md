@@ -1,6 +1,8 @@
-# WPS JSON 字段提取加载项
+# TABBOX · WPS 表格工具箱
 
-通过 `=JSON.GET(A2,"user.name")` 提取单元格 JSON 字段。通过 `=JSON.TIME(A2)` 将时间戳转换为北京时间文本。解析和转换均在本机运行，不调用外部接口。
+通过 `=TABBOX.JSONGET(A2,"user.name")` 提取单元格 JSON 字段。通过 `=TABBOX.TIME(A2)` 将时间戳转换为北京时间文本。解析和转换均在本机运行，不调用外部接口。
+
+从旧版升级时，请把已有公式中的 `JSON.GET` 和 `JSON.TIME` 分别改为 `TABBOX.JSONGET` 和 `TABBOX.TIME`。WPS 加载项管理中仍使用安装名称 `wps-json-get`，方便原位升级。安装后重新打开 WPS 表格，若加载项显示禁用，请在“工具 → WPS 加载项”中启用。重启并打开表格后，若提示加载项已修改，请确认加载。
 
 ## 当前状态
 
@@ -12,7 +14,7 @@
 ## 已完成的验证
 
 1. 自行编写的 8 项 JSON 函数验证、4 项时间戳转换与注册验证、3 项 Mac 安装验证通过。安装验证使用临时目录和空的工具搜索路径，覆盖首次安装、重复安装备份及损坏配置保护。
-2. Windows PowerShell 5.1 的 7 项安装验证通过，覆盖首次安装、本地离线命令、重复安装与备份、损坏配置保护、最终替换失败恢复、独立脚本下载和 README 在线命令。全部使用临时目录和空 PATH；[查看 Windows 验证结果](https://github.com/jinsuojinsuo/wps-json-get/actions/runs/40257557783)。
+2. Windows PowerShell 5.1 的 7 项安装验证通过，覆盖首次安装、本地离线命令、重复安装与备份、损坏配置保护、最终替换失败恢复、独立脚本下载和 README 在线命令。全部使用临时目录和空 PATH；[查看 Windows 验证结果](https://github.com/jinsuojinsuo/wps-tabbox/actions/runs/40257557783)。
 3. dist 构建和临时 HTTP 加载、模拟宿主注册通过。
 4. 官方 wpsjs 2.2.3 已在本目录安装，依赖锁定文件已生成；调试模块可加载。
 5. 此前 JSON 函数与 Mac 安装器的独立只读审查未发现需要修复的确定缺陷。真实 Windows / Mac WPS 内的计算尚未验证。
@@ -30,11 +32,11 @@
 2. 从开始菜单打开“Windows PowerShell”，复制执行下面这一行：
 
    ```powershell
-   & ([scriptblock]::Create((Invoke-WebRequest -UseBasicParsing 'https://raw.githubusercontent.com/jinsuojinsuo/wps-json-get/main/install.ps1').Content.TrimStart([char]0xFEFF)))
+   & ([scriptblock]::Create((Invoke-WebRequest -UseBasicParsing 'https://raw.githubusercontent.com/jinsuojinsuo/wps-tabbox/main/install.ps1').Content.TrimStart([char]0xFEFF)))
    ```
 
    首次下载需要联网访问 GitHub。使用系统自带的 PowerShell、ZIP 解压和 XML 处理能力，直接安装现成运行文件；不需要 Git、Node.js、npm、Python 或编译环境，也不会修改执行策略。
-3. 完全离线安装：预先下载[完整项目 ZIP](https://github.com/jinsuojinsuo/wps-json-get/archive/refs/heads/main.zip)，解压并进入包含 `install.ps1`、`package.json` 和 `index.html` 的项目文件夹。在该文件夹打开 PowerShell，执行：
+3. 完全离线安装：预先下载[完整项目 ZIP](https://github.com/jinsuojinsuo/wps-tabbox/archive/refs/heads/main.zip)，解压并进入包含 `install.ps1`、`package.json` 和 `index.html` 的项目文件夹。在该文件夹打开 PowerShell，执行：
 
    ```powershell
    & ([scriptblock]::Create((Get-Content -LiteralPath .\install.ps1 -Raw -Encoding UTF8)))
@@ -52,7 +54,7 @@
 6. 重新打开 WPS 表格，输入：
 
    ```excel
-   =JSON.GET("[10,20,30]","[0]")
+   =TABBOX.JSONGET("[10,20,30]","[0]")
    ```
 
    预期返回 `10`。完全退出并重启 WPS 后再次计算成功，才能确认当前客户端离线加载有效。之后无需保留 PowerShell 窗口或启动任何服务；真实 Windows WPS 的公式兼容性仍需实际验证。
@@ -63,7 +65,7 @@
 2. 在终端复制执行下面这一行：
 
    ```sh
-   /bin/bash -o pipefail -c '/usr/bin/curl -fsSL --retry 2 https://raw.githubusercontent.com/jinsuojinsuo/wps-json-get/main/install.sh | /bin/bash'
+   /bin/bash -o pipefail -c '/usr/bin/curl -fsSL --retry 2 https://raw.githubusercontent.com/jinsuojinsuo/wps-tabbox/main/install.sh | /bin/bash'
    ```
 
    首次下载需要联网访问 GitHub。脚本使用 macOS 自带工具下载 ZIP 并复制现成的 6 个运行文件，不调用 git、node、npm、Python 或编译器，也不会要求安装命令行开发工具。
@@ -79,7 +81,7 @@
 6. 安装结束后重新打开 WPS 表格，输入：
 
    ```excel
-   =JSON.GET("[10,20,30]","[0]")
+   =TABBOX.JSONGET("[10,20,30]","[0]")
    ```
 
    预期返回 `10`。完全退出并重启 WPS 后再次计算成功，才能确认本机离线加载有效。之后无需保留终端或本机服务。
@@ -88,10 +90,9 @@
 ## 方式二：debug 调试加载
 
 1. 安装 Node.js 18 或更高版本。已安装则跳过。
-2. 在终端执行：
+2. 在解压后的项目目录打开终端，执行：
 
    ```sh
-   cd /Users/liujinsuo/Desktop/code/wps-json-get
    npm install --ignore-scripts
    npm run wps:debug
    ```
@@ -99,16 +100,15 @@
    `wpsjs` 固定为官方 2.2.3 版本，是开发调试工具；首次安装需要联网下载。JSON 内容不发送给该工具的服务器。
 3. 等待工具启动 WPS，打开一个空白表格。首次出现加载项信任提示时，核对名称为 `wps-json-get` 后按提示操作。
 4. 如果 WPS 此前正在运行，先保存文档，再完全退出 WPS 后重新打开；调试终端保持运行。
-5. 在功能区找到“JSON 工具”，点击“检查函数状态”。“已提交注册”只表示接口调用完成，还需按下面的例子确认公式实际可用。
+5. 在功能区找到“TABBOX”，点击“检查函数状态”。“已提交注册”只表示接口调用完成，还需按下面的例子确认公式实际可用。
 6. 如果提示未提供自定义函数接口，说明当前 Mac 客户端的这项能力未开放或未正确加载；仅凭版本号不能确认兼容。
 
 ## 方式三：手动离线安装（Mac）
 
 1. 保存所有文档并完全退出 WPS。如果正在运行 debug，在对应终端按 Control+C 停止服务。
-2. 在终端生成加载项运行文件：
+2. 在项目目录打开终端，生成加载项运行文件：
 
    ```sh
-   cd /Users/liujinsuo/Desktop/code/wps-json-get
    npm run build
    ```
 
@@ -154,11 +154,11 @@
    如果已有 `publish.xml`，只把上面的 `<jsplugin .../>` 记录加入现有 `<jsplugins>` 节点内，保留其他加载项和配置。已经存在同名 `wps-json-get` 的离线记录时更新该条记录；存在同名 `<jspluginonline>` 调试记录时移除它，避免重复加载。
 
    `url` 是相对于 jsaddons 的文件夹名，必须与复制的 `wps-json-get_1.0.0` 完全一致。它不是 `http://127.0.0.1:3893/`，也不是 dist 所在的项目路径。后续更改版本号时，同步调整文件夹名与 `version`。
-6. 保持 debug 服务关闭，重新打开 WPS 表格。若出现加载项信任提示，核对名称 `wps-json-get` 后按提示操作；在“JSON 工具”中点击“检查函数状态”。
+6. 保持 debug 服务关闭，重新打开 WPS 表格。若出现加载项信任提示，核对名称 `wps-json-get` 后按提示操作；在“TABBOX”中点击“检查函数状态”。
 7. 在空白单元格输入：
 
    ```excel
-   =JSON.GET("[10,20,30]","[0]")
+   =TABBOX.JSONGET("[10,20,30]","[0]")
    ```
 
    预期返回数值 `10`。完全退出并重新打开 WPS 后再次计算成功，才能确认本机离线加载有效；此后无需启动 `npm run wps:debug`。Mac 客户端仍可能存在加载项或自定义函数兼容性差异，本项目尚未完成真实 WPS 的这项验证。
@@ -181,27 +181,27 @@
 
    | 公式 | 预期结果 |
    | --- | --- |
-   | `=JSON.GET(A2,"uid")` | 数值 123 |
-   | `=JSON.GET(A2,"user.name")` | 文本 张三 |
-   | `=JSON.GET(A2,"items[0].id")` | 数值 8 |
-   | `=JSON.GET(A2,"active")` | 布尔 FALSE |
-   | `=JSON.GET(A2,"nothing")` | 空文本 |
-   | `=JSON.GET(A2,"user")` | 文本 `{"name":"张三"}` |
-   | `=JSON.GET(A2,"id")` | 保留完整长编号的文本 |
+   | `=TABBOX.JSONGET(A2,"uid")` | 数值 123 |
+   | `=TABBOX.JSONGET(A2,"user.name")` | 文本 张三 |
+   | `=TABBOX.JSONGET(A2,"items[0].id")` | 数值 8 |
+   | `=TABBOX.JSONGET(A2,"active")` | 布尔 FALSE |
+   | `=TABBOX.JSONGET(A2,"nothing")` | 空文本 |
+   | `=TABBOX.JSONGET(A2,"user")` | 文本 `{"name":"张三"}` |
+   | `=TABBOX.JSONGET(A2,"id")` | 保留完整长编号的文本 |
 
 3. 向下填充公式即可解析后续行；源单元格变化时由 WPS 的公式计算机制重新求值。
 4. 数组下标从 0 开始。根数组使用 `[0].id`；空路径 `""` 返回整个 JSON，根值为 null 时返回空文本。
-5. 字段名含点号或方括号时，可以把路径 `["a.b"]["x[y]"]` 写在 B1，再使用 `=JSON.GET(A2,B1)`。不支持通配符、筛选表达式或完整 JSONPath。
+5. 字段名含点号或方括号时，可以把路径 `["a.b"]["x[y]"]` 写在 B1，再使用 `=TABBOX.JSONGET(A2,B1)`。不支持通配符、筛选表达式或完整 JSONPath。
 
 ## 时间戳转时间
 
-1. 秒级时间戳使用 `=JSON.TIME(A2)`，也可明确写成 `=JSON.TIME(A2,"s")`。例如 A2 为 `1704067200`，返回文本 `2024-01-01 08:00:00`。
-2. 毫秒级时间戳使用 `=JSON.TIME(A2,"ms")`。例如 A2 为 `1704067200123`，同样返回 `2024-01-01 08:00:00`，不显示小数秒。函数不会自动猜测单位，省略或留空单位时按秒处理。
+1. 秒级时间戳使用 `=TABBOX.TIME(A2)`，也可明确写成 `=TABBOX.TIME(A2,"s")`。例如 A2 为 `1704067200`，返回文本 `2024-01-01 08:00:00`。
+2. 毫秒级时间戳使用 `=TABBOX.TIME(A2,"ms")`。例如 A2 为 `1704067200123`，同样返回 `2024-01-01 08:00:00`，不显示小数秒。函数不会自动猜测单位，省略或留空单位时按秒处理。
 3. JSON 中的时间戳可以直接组合提取与转换：
 
    ```excel
-   =JSON.TIME(JSON.GET(A2,"create_time"))
-   =JSON.TIME(JSON.GET(A2,"create_time"),"ms")
+   =TABBOX.TIME(TABBOX.JSONGET(A2,"create_time"))
+   =TABBOX.TIME(TABBOX.JSONGET(A2,"create_time"),"ms")
    ```
 
 4. 固定按北京时间（UTC+8）返回 `yyyy-MM-dd HH:mm:ss` 文本，不受电脑时区设置或历史夏令时影响。返回值不是表格原生日期数值。
@@ -240,7 +240,7 @@
 
 ## 排查和移除
 
-1. `#NAME?`：先确认 WPS 表格已加载“JSON 工具”，再检查函数状态。debug 方式需要调试服务正在运行；离线方式检查本地目录、publish.xml 的同名记录和文件结构。配置变化后需要完全退出并重启 WPS。
+1. `#NAME?`：先确认 WPS 表格已加载“TABBOX”，再检查函数状态。debug 方式需要调试服务正在运行；离线方式检查本地目录、publish.xml 的同名记录和文件结构。配置变化后需要完全退出并重启 WPS。
 2. 端口 3893 被占用：停止占用该端口的旧调试进程，或手动执行 `npx wpsjs debug --port 3894`。
 3. 停止本次调试：在调试终端按 Control+C；这不等于删除已注册的加载项配置。
 4. 需要移除时，在 WPS 的加载项管理入口找到 `wps-json-get` 并禁用或删除。入口因版本而异，勿清空其他加载项或整个配置目录。

@@ -58,13 +58,13 @@ try {
         $previousTls = [Net.ServicePointManager]::SecurityProtocol
         try {
             [Net.ServicePointManager]::SecurityProtocol = $previousTls -bor [Net.SecurityProtocolType]::Tls12
-            Invoke-WebRequest -UseBasicParsing -Uri 'https://codeload.github.com/jinsuojinsuo/wps-json-get/zip/refs/heads/main' -OutFile $archive -TimeoutSec 120
+            Invoke-WebRequest -UseBasicParsing -Uri 'https://codeload.github.com/jinsuojinsuo/wps-tabbox/zip/refs/heads/main' -OutFile $archive -TimeoutSec 120
         } finally {
             [Net.ServicePointManager]::SecurityProtocol = $previousTls
         }
         $extracted = Join-Path $workDirectory 'source'
         Expand-Archive -LiteralPath $archive -DestinationPath $extracted
-        $sourceDirectory = Join-Path $extracted 'wps-json-get-main'
+        $sourceDirectory = Join-Path $extracted 'wps-tabbox-main'
     }
 
     $runtimeFiles = @('index.html', 'main.js', 'manifest.xml', 'functions.json', 'ribbon.xml', 'js/functions.js')
@@ -149,7 +149,7 @@ try {
     Write-Host "安装文件和配置已写入：$installDirectory"
     if ($backupDirectory) { Write-Host "原配置和同版本旧文件已备份到：$backupDirectory" }
     Write-Host '无需 Git、Node.js、npm、Python 或编译环境，也无需常驻服务。'
-    Write-Host '请重新打开 WPS 表格，验证公式：=JSON.GET("[10,20,30]","[0]")，预期返回 10。'
+    Write-Host '请重新打开 WPS 表格，验证公式：=TABBOX.JSONGET("[10,20,30]","[0]")，预期返回 10。'
     Write-Host '文件安装完成不代表当前 WPS 客户端已支持自定义函数，仍需实际验证。'
 } catch {
     if (-not $committed) {

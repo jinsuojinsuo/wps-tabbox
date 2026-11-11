@@ -151,7 +151,7 @@ try {
         $target = New-TestTarget 'online-command'
         Push-Location -LiteralPath $testRoot
         try {
-            & ([scriptblock]::Create((Invoke-WebRequest -UseBasicParsing 'https://raw.githubusercontent.com/jinsuojinsuo/wps-json-get/main/install.ps1').Content.TrimStart([char]0xFEFF)))
+            & ([scriptblock]::Create((Invoke-WebRequest -UseBasicParsing 'https://raw.githubusercontent.com/jinsuojinsuo/wps-tabbox/main/install.ps1').Content.TrimStart([char]0xFEFF)))
         } finally {
             Pop-Location
         }

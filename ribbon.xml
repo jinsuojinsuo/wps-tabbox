@@ -2,7 +2,7 @@
 <customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui" onLoad="OnAddinLoad">
   <ribbon startFromScratch="false">
     <tabs>
-      <tab id="wpsJsonTab" label="JSON 工具">
+      <tab id="wpsJsonTab" label="TABBOX">
         <group id="wpsJsonFunctions" label="字段提取">
           <button id="wpsJsonStatus" label="检查函数状态" onAction="OnJsonStatus" size="normal"/>
         </group>

@@ -5,6 +5,6 @@
   <Description>本地解析 JSON 并通过单元格公式提取字段</Description>
   <Functions>
     <Uri>/functions.json</Uri>
-    <Namespace>JSON</Namespace>
+    <Namespace>TABBOX</Namespace>
   </Functions>
 </JsPlugin>
