@@ -2,7 +2,7 @@
 
 通过 `=TABBOX.JSONGET(A2,"user.name")` 提取单元格 JSON 字段。通过 `=TABBOX.TIME(A2)` 将时间戳转换为北京时间文本。解析和转换均在本机运行，不调用外部接口。
 
-从旧版升级时，请把已有公式中的 `JSON.GET` 和 `JSON.TIME` 分别改为 `TABBOX.JSONGET` 和 `TABBOX.TIME`。WPS 加载项管理中仍使用安装名称 `wps-json-get`，方便原位升级。安装后重新打开 WPS 表格，若加载项显示禁用，请在“工具 → WPS 加载项”中启用。重启并打开表格后，若提示加载项已修改，请确认加载。
+安装后重新打开 WPS 表格。如果加载项显示禁用，请在“工具 → WPS 加载项”中启用 `wps-tabbox`。重启并打开表格后，如果提示加载项已修改，请确认加载。
 
 ## 当前状态
 
@@ -46,10 +46,10 @@
 4. 默认安装目录：
 
    ```text
-   %APPDATA%\kingsoft\wps\jsaddons\wps-json-get_1.0.0
+   %APPDATA%\kingsoft\wps\jsaddons\wps-tabbox_1.0.0
    ```
 
-   脚本自动读取项目版本，合并同目录的 `publish.xml`，替换本项目原有的在线调试或离线记录，保留其他加载项。原配置和同版本旧目录备份到 `jsaddons\.wps-json-get-backups\` 下，脚本会打印本次备份位置。
+   脚本自动读取项目版本，合并同目录的 `publish.xml`，替换本项目原有的在线调试或离线记录，保留其他加载项。原配置和同版本旧目录备份到 `jsaddons\.wps-tabbox-backups\` 下，脚本会打印本次备份位置。
 5. 配置损坏时拒绝覆盖；最终配置替换失败时会尝试恢复同版本旧目录。需要手动恢复时，先退出 WPS，再按打印的备份路径恢复原配置和目录。如果之后安装了其他加载项，应只恢复本项目记录，避免覆盖后来的配置。
 6. 重新打开 WPS 表格，输入：
 
@@ -76,7 +76,7 @@
    ```
 
    这种方式直接使用本地文件，不需要 Git、编译环境或联网；也不需要执行 `npm install` 或 `npm run build`。
-4. 脚本自动读取项目版本，安装到 WPS 的 jsaddons 目录，并用离线记录替换本项目原有的在线调试或离线记录。其他加载项保留。已有配置和同版本旧文件会备份到插件目录的 `.wps-json-get-backups/` 下，脚本会打印本次备份路径。
+4. 脚本自动读取项目版本，安装到 WPS 的 jsaddons 目录，并用离线记录替换本项目原有的在线调试或离线记录。其他加载项保留。已有配置和同版本旧文件会备份到插件目录的 `.wps-tabbox-backups/` 下，脚本会打印本次备份路径。
 5. 如果 `publish.xml` 损坏或根节点不正确，脚本会拒绝覆盖；文件替换未完成时发生失败，会尝试恢复本次移动的旧文件。脚本不自动删除其他版本目录，也不修改 WPS 安全设置。
 6. 安装结束后重新打开 WPS 表格，输入：
 
@@ -98,7 +98,7 @@
    ```
 
    `wpsjs` 固定为官方 2.2.3 版本，是开发调试工具；首次安装需要联网下载。JSON 内容不发送给该工具的服务器。
-3. 等待工具启动 WPS，打开一个空白表格。首次出现加载项信任提示时，核对名称为 `wps-json-get` 后按提示操作。
+3. 等待工具启动 WPS，打开一个空白表格。首次出现加载项信任提示时，核对名称为 `wps-tabbox` 后按提示操作。
 4. 如果 WPS 此前正在运行，先保存文档，再完全退出 WPS 后重新打开；调试终端保持运行。
 5. 在功能区找到“TABBOX”，点击“检查函数状态”。“已提交注册”只表示接口调用完成，还需按下面的例子确认公式实际可用。
 6. 如果提示未提供自定义函数接口，说明当前 Mac 客户端的这项能力未开放或未正确加载；仅凭版本号不能确认兼容。
@@ -119,12 +119,12 @@
    /Users/liujinsuo/Library/Containers/com.kingsoft.wpsoffice.mac/Data/.kingsoft/wps/jsaddons
    ```
 
-   在该目录中创建 `wps-json-get_1.0.0` 文件夹，把项目 `dist/` 里面的全部内容复制进去。不要再套一层 dist 目录。最终结构为：
+   在该目录中创建 `wps-tabbox_1.0.0` 文件夹，把项目 `dist/` 里面的全部内容复制进去。不要再套一层 dist 目录。最终结构为：
 
    ```text
    jsaddons/
      publish.xml
-     wps-json-get_1.0.0/
+     wps-tabbox_1.0.0/
        index.html
        main.js
        manifest.xml
@@ -141,9 +141,9 @@
    <?xml version="1.0" encoding="UTF-8"?>
    <jsplugins>
      <jsplugin
-       name="wps-json-get"
+       name="wps-tabbox"
        type="et"
-       url="wps-json-get_1.0.0"
+       url="wps-tabbox_1.0.0"
        version="1.0.0"
        enable="enable_dev"
        install="null"
@@ -151,10 +151,10 @@
    </jsplugins>
    ```
 
-   如果已有 `publish.xml`，只把上面的 `<jsplugin .../>` 记录加入现有 `<jsplugins>` 节点内，保留其他加载项和配置。已经存在同名 `wps-json-get` 的离线记录时更新该条记录；存在同名 `<jspluginonline>` 调试记录时移除它，避免重复加载。
+   如果已有 `publish.xml`，只把上面的 `<jsplugin .../>` 记录加入现有 `<jsplugins>` 节点内，保留其他加载项和配置。已经存在同名 `wps-tabbox` 的离线记录时更新该条记录；存在同名 `<jspluginonline>` 调试记录时移除它，避免重复加载。
 
-   `url` 是相对于 jsaddons 的文件夹名，必须与复制的 `wps-json-get_1.0.0` 完全一致。它不是 `http://127.0.0.1:3893/`，也不是 dist 所在的项目路径。后续更改版本号时，同步调整文件夹名与 `version`。
-6. 保持 debug 服务关闭，重新打开 WPS 表格。若出现加载项信任提示，核对名称 `wps-json-get` 后按提示操作；在“TABBOX”中点击“检查函数状态”。
+   `url` 是相对于 jsaddons 的文件夹名，必须与复制的 `wps-tabbox_1.0.0` 完全一致。它不是 `http://127.0.0.1:3893/`，也不是 dist 所在的项目路径。后续更改版本号时，同步调整文件夹名与 `version`。
+6. 保持 debug 服务关闭，重新打开 WPS 表格。若出现加载项信任提示，核对名称 `wps-tabbox` 后按提示操作；在“TABBOX”中点击“检查函数状态”。
 7. 在空白单元格输入：
 
    ```excel
@@ -229,7 +229,7 @@
 
 2. 构建产物位于 `dist/`，只包含 6 个加载项运行文件。构建本身不安装、不注册、不启动 WPS。
 3. 验证涵盖嵌套路径、错误反馈、原型字段隔离、大整数保护、函数声明、注册回调和安装配置合并；模拟宿主和临时目录安装通过不代表真实 Mac WPS 公式已验证。
-4. 安装器验证使用 `WPS_JSON_GET_ADDONS_DIR` 指定临时目录，避免改动实际 WPS 配置；日常用户不需要设置此变量。Mac 验证需要开发用 Node.js，安装端不需要。
+4. 安装器验证使用 `WPS_TABBOX_ADDONS_DIR` 指定临时目录，避免改动实际 WPS 配置；日常用户不需要设置此变量。Mac 验证需要开发用 Node.js，安装端不需要。
 5. Windows 安装器验证使用 PowerShell，不需要 Node.js。在项目目录执行：
 
    ```powershell
@@ -243,7 +243,7 @@
 1. `#NAME?`：先确认 WPS 表格已加载“TABBOX”，再检查函数状态。debug 方式需要调试服务正在运行；离线方式检查本地目录、publish.xml 的同名记录和文件结构。配置变化后需要完全退出并重启 WPS。
 2. 端口 3893 被占用：停止占用该端口的旧调试进程，或手动执行 `npx wpsjs debug --port 3894`。
 3. 停止本次调试：在调试终端按 Control+C；这不等于删除已注册的加载项配置。
-4. 需要移除时，在 WPS 的加载项管理入口找到 `wps-json-get` 并禁用或删除。入口因版本而异，勿清空其他加载项或整个配置目录。
+4. 需要移除时，在 WPS 的加载项管理入口找到 `wps-tabbox` 并禁用或删除。入口因版本而异，勿清空其他加载项或整个配置目录。
 
 ## 官方参考
 

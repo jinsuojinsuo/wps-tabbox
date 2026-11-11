@@ -8,12 +8,12 @@ $projectRoot = Split-Path -Parent $PSScriptRoot
 $installer = Join-Path $projectRoot 'install.ps1'
 if (-not (Test-Path -LiteralPath $installer -PathType Leaf)) { throw 'install.ps1 不存在。' }
 $package = Get-Content -LiteralPath (Join-Path $projectRoot 'package.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-$folderName = 'wps-json-get_' + $package.version
+$folderName = 'wps-tabbox_' + $package.version
 $runtimeFiles = @('index.html', 'main.js', 'manifest.xml', 'functions.json', 'ribbon.xml', 'js/functions.js')
 $testRoot = Join-Path ([IO.Path]::GetTempPath()) ('wps-json-windows-test-' + [guid]::NewGuid().ToString('N'))
 [void][IO.Directory]::CreateDirectory($testRoot)
 $originalPath = $env:PATH
-$originalTarget = $env:WPS_JSON_GET_ADDONS_DIR
+$originalTarget = $env:WPS_TABBOX_ADDONS_DIR
 $passed = 0
 
 function Assert-Equal($Actual, $Expected, [string]$Message) {
@@ -23,7 +23,7 @@ function Assert-Equal($Actual, $Expected, [string]$Message) {
 function New-TestTarget([string]$Name) {
     $target = Join-Path $testRoot ($Name + '/中文 [安装] 目录/jsaddons')
     [void][IO.Directory]::CreateDirectory($target)
-    $env:WPS_JSON_GET_ADDONS_DIR = $target
+    $env:WPS_TABBOX_ADDONS_DIR = $target
     return $target
 }
 
@@ -56,7 +56,7 @@ try {
     Assert-Runtime $target
     $config = Join-Path $target 'publish.xml'
     $xml = Read-TestXml $config
-    $record = $xml.SelectSingleNode('/jsplugins/jsplugin[@name="wps-json-get"]')
+    $record = $xml.SelectSingleNode('/jsplugins/jsplugin[@name="wps-tabbox"]')
     Assert-Equal $record.GetAttribute('url') $folderName '登记目录错误'
     Assert-Equal $record.GetAttribute('type') 'et' '组件类型错误'
     $passed++
@@ -78,26 +78,26 @@ try {
 
     $target = New-TestTarget 'repeat'
     $config = Join-Path $target 'publish.xml'
-    $original = '<?xml version="1.0"?><jsplugins><!--保留说明--><jspluginonline name="other" url="https://example.com/a?x=1&amp;y=2" enable="disabled" custom="值"/><jspluginonline name="wps-json-get" url="http://127.0.0.1:3893/"/><jsplugin name="wps-json-get" url="old"/></jsplugins>'
+    $original = '<?xml version="1.0"?><jsplugins><!--保留说明--><jspluginonline name="other" url="https://example.com/a?x=1&amp;y=2" enable="disabled" custom="值"/><jspluginonline name="wps-tabbox" url="http://127.0.0.1:3893/"/><jsplugin name="wps-tabbox" url="old"/></jsplugins>'
     [IO.File]::WriteAllText($config, $original, (New-Object Text.UTF8Encoding $false))
     $oldFolder = Join-Path $target $folderName
     [void][IO.Directory]::CreateDirectory($oldFolder)
     [IO.File]::WriteAllText((Join-Path $oldFolder 'old-marker'), '原安装文件')
     & $installer
     $xml = Read-TestXml $config
-    Assert-Equal $xml.SelectNodes('/jsplugins/*[@name="wps-json-get"]').Count 1 '出现重复记录'
+    Assert-Equal $xml.SelectNodes('/jsplugins/*[@name="wps-tabbox"]').Count 1 '出现重复记录'
     $other = $xml.SelectSingleNode('/jsplugins/jspluginonline[@name="other"]')
     Assert-Equal $other.GetAttribute('url') 'https://example.com/a?x=1&y=2' '其他加载项 URL 改变'
     Assert-Equal $other.GetAttribute('enable') 'disabled' '其他加载项状态改变'
     Assert-Equal $other.GetAttribute('custom') '值' '其他加载项自定义属性改变'
     if (-not [IO.File]::ReadAllText($config).Contains('保留说明')) { throw '其他注释丢失。' }
-    $backups = @(Get-ChildItem -LiteralPath (Join-Path $target '.wps-json-get-backups') -Directory)
+    $backups = @(Get-ChildItem -LiteralPath (Join-Path $target '.wps-tabbox-backups') -Directory)
     Assert-Equal $backups.Count 1 '未保存唯一的安装备份'
     Assert-Equal ([IO.File]::ReadAllText((Join-Path $backups[0].FullName 'publish.xml'))) $original '原配置备份不一致'
     Assert-Equal ([IO.File]::ReadAllText((Join-Path (Join-Path $backups[0].FullName $folderName) 'old-marker'))) '原安装文件' '旧文件没有备份'
     & $installer
     $xml = Read-TestXml $config
-    Assert-Equal $xml.SelectNodes('/jsplugins/*[@name="wps-json-get"]').Count 1 '重复安装生成重复记录'
+    Assert-Equal $xml.SelectNodes('/jsplugins/*[@name="wps-tabbox"]').Count 1 '重复安装生成重复记录'
     $passed++
     Write-Host 'PASS：重复安装保留其他加载项并保存可恢复备份'
 
@@ -162,6 +162,6 @@ try {
     Write-Host "通过 $passed 项安装验证；全部在临时目录执行。"
 } finally {
     $env:PATH = $originalPath
-    $env:WPS_JSON_GET_ADDONS_DIR = $originalTarget
+    $env:WPS_TABBOX_ADDONS_DIR = $originalTarget
     Remove-Item -LiteralPath $testRoot -Recurse -Force -ErrorAction SilentlyContinue
 }

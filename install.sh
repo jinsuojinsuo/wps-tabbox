@@ -40,12 +40,12 @@ main() {
 
     default_addons_dir="$HOME/Library/Containers/com.kingsoft.wpsoffice.mac/Data/.kingsoft/wps/jsaddons"
     # 仅供隔离验证或明确指定安装目录；日常安装无需设置。
-    addons_dir="${WPS_JSON_GET_ADDONS_DIR:-$default_addons_dir}"
+    addons_dir="${WPS_TABBOX_ADDONS_DIR:-$default_addons_dir}"
     if [[ "$addons_dir" == "$default_addons_dir" ]] && /usr/bin/pgrep -x wpsoffice >/dev/null; then
         fail "请先保存文档并完全退出 WPS，再重新运行安装命令。"
     fi
 
-    work_dir="$(/usr/bin/mktemp -d "${TMPDIR:-/tmp}/wps-json-get.XXXXXX")"
+    work_dir="$(/usr/bin/mktemp -d "${TMPDIR:-/tmp}/wps-tabbox.XXXXXX")"
     trap cleanup EXIT
     trap 'exit 130' INT
     trap 'exit 143' TERM
@@ -74,13 +74,13 @@ main() {
         [[ -f "$source_dir/$runtime_file" ]] || fail "缺少运行文件：$runtime_file"
     done
     project_name="$(/usr/bin/plutil -extract name raw -o - "$source_dir/package.json")"
-    [[ "$project_name" == wps-json-get ]] || fail "下载内容不是 wps-json-get 项目。"
+    [[ "$project_name" == wps-tabbox ]] || fail "下载内容不是 wps-tabbox 项目。"
     plugin_version="$(/usr/bin/plutil -extract version raw -o - "$source_dir/package.json")"
     [[ "$plugin_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][A-Za-z0-9.-]+)?$ ]] || fail "项目版本号格式无效。"
     /usr/bin/xmllint --nonet --noout "$source_dir/manifest.xml" "$source_dir/ribbon.xml" || fail "运行文件 XML 格式无效。"
     /usr/bin/plutil -convert xml1 -o "$work_dir/functions.plist" "$source_dir/functions.json" || fail "函数声明 JSON 格式无效。"
 
-    plugin_folder="wps-json-get_$plugin_version"
+    plugin_folder="wps-tabbox_$plugin_version"
     install_dir="$addons_dir/$plugin_folder"
     publish_file="$addons_dir/publish.xml"
     [[ ! -e "$install_dir" || -d "$install_dir" ]] || fail "安装位置已被同名文件占用：$install_dir"
@@ -105,14 +105,14 @@ main() {
   </xsl:template>
   <xsl:template match="/jsplugins">
     <xsl:copy>
-      <xsl:apply-templates select="@*|node()[not((self::jsplugin or self::jspluginonline) and @name='wps-json-get')]"/>
-      <jsplugin name="wps-json-get" type="et" url="{$folder}" version="{$version}" enable="enable_dev" install="null" customDomain=""/>
+      <xsl:apply-templates select="@*|node()[not((self::jsplugin or self::jspluginonline) and @name='wps-tabbox')]"/>
+      <jsplugin name="wps-tabbox" type="et" url="{$folder}" version="{$version}" enable="enable_dev" install="null" customDomain=""/>
     </xsl:copy>
   </xsl:template>
 </xsl:stylesheet>
 XSL
     /bin/mkdir -p "$addons_dir"
-    stage_dir="$(/usr/bin/mktemp -d "$addons_dir/.wps-json-get-stage.XXXXXX")"
+    stage_dir="$(/usr/bin/mktemp -d "$addons_dir/.wps-tabbox-stage.XXXXXX")"
     /usr/bin/xsltproc --nonet --stringparam version "$plugin_version" --stringparam folder "$plugin_folder" \
         "$work_dir/merge.xsl" "$config_source" > "$stage_dir/publish.xml"
     /usr/bin/xmllint --nonet --noout "$stage_dir/publish.xml" || fail "生成的配置无效，原配置未改动。"
@@ -122,8 +122,8 @@ XSL
     done
 
     if [[ -e "$publish_file" || -d "$install_dir" ]]; then
-        /bin/mkdir -p "$addons_dir/.wps-json-get-backups"
-        backup_dir="$(/usr/bin/mktemp -d "$addons_dir/.wps-json-get-backups/$(/bin/date +%Y%m%d-%H%M%S).XXXXXX")"
+        /bin/mkdir -p "$addons_dir/.wps-tabbox-backups"
+        backup_dir="$(/usr/bin/mktemp -d "$addons_dir/.wps-tabbox-backups/$(/bin/date +%Y%m%d-%H%M%S).XXXXXX")"
         if [[ -e "$publish_file" ]]; then
             /bin/cp -p "$publish_file" "$backup_dir/publish.xml"
         fi

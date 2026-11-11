@@ -31,7 +31,7 @@ $committed = $false
 
 try {
     $isWindowsPlatform = [Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT
-    $customDirectory = $env:WPS_JSON_GET_ADDONS_DIR
+    $customDirectory = $env:WPS_TABBOX_ADDONS_DIR
     if (-not $isWindowsPlatform -and -not $customDirectory) {
         throw '此安装脚本适用于 Windows；macOS 请使用 install.sh。'
     }
@@ -46,7 +46,7 @@ try {
         }
     }
 
-    $workDirectory = Join-Path ([IO.Path]::GetTempPath()) ('wps-json-get-' + [guid]::NewGuid().ToString('N'))
+    $workDirectory = Join-Path ([IO.Path]::GetTempPath()) ('wps-tabbox-' + [guid]::NewGuid().ToString('N'))
     [void][IO.Directory]::CreateDirectory($workDirectory)
     $sourceDirectory = $PSScriptRoot
     if (-not $sourceDirectory) { $sourceDirectory = (Get-Location).ProviderPath }
@@ -74,14 +74,14 @@ try {
         }
     }
     $package = Get-Content -LiteralPath (Join-Path $sourceDirectory 'package.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-    if ($package.name -cne 'wps-json-get') { throw '下载内容不是 wps-json-get 项目。' }
+    if ($package.name -cne 'wps-tabbox') { throw '下载内容不是 wps-tabbox 项目。' }
     $version = [string]$package.version
     if ($version -cnotmatch '^[0-9]+\.[0-9]+\.[0-9]+([.-][A-Za-z0-9.-]+)?$') { throw '项目版本号格式无效。' }
     [void](Read-WpsXml (Join-Path $sourceDirectory 'manifest.xml'))
     [void](Read-WpsXml (Join-Path $sourceDirectory 'ribbon.xml'))
     [void](Get-Content -LiteralPath (Join-Path $sourceDirectory 'functions.json') -Raw -Encoding UTF8 | ConvertFrom-Json)
 
-    $pluginFolder = 'wps-json-get_' + $version
+    $pluginFolder = 'wps-tabbox_' + $version
     $installDirectory = Join-Path $addonsDirectory $pluginFolder
     $publishFile = Join-Path $addonsDirectory 'publish.xml'
     if ((Test-Path -LiteralPath $installDirectory) -and -not [IO.Directory]::Exists($installDirectory)) {
@@ -101,17 +101,17 @@ try {
     foreach ($node in @($document.DocumentElement.ChildNodes)) {
         if ($node.get_NodeType() -eq [System.Xml.XmlNodeType]::Element -and
             ($node.get_Name() -ceq 'jsplugin' -or $node.get_Name() -ceq 'jspluginonline') -and
-            $node.GetAttribute('name') -ceq 'wps-json-get') {
+            $node.GetAttribute('name') -ceq 'wps-tabbox') {
             [void]$document.DocumentElement.RemoveChild($node)
         }
     }
     $record = $document.CreateElement('jsplugin')
-    $attributes = @{ name='wps-json-get'; type='et'; url=$pluginFolder; version=$version; enable='enable_dev'; install='null'; customDomain='' }
+    $attributes = @{ name='wps-tabbox'; type='et'; url=$pluginFolder; version=$version; enable='enable_dev'; install='null'; customDomain='' }
     foreach ($key in $attributes.Keys) { $record.SetAttribute($key, $attributes[$key]) }
     [void]$document.DocumentElement.AppendChild($record)
 
     [void][IO.Directory]::CreateDirectory($addonsDirectory)
-    $stageDirectory = Join-Path $addonsDirectory ('.wps-json-get-stage.' + [guid]::NewGuid().ToString('N'))
+    $stageDirectory = Join-Path $addonsDirectory ('.wps-tabbox-stage.' + [guid]::NewGuid().ToString('N'))
     [void][IO.Directory]::CreateDirectory($stageDirectory)
     $stagedPublish = Join-Path $stageDirectory 'publish.xml'
     $writerSettings = New-Object System.Xml.XmlWriterSettings
@@ -127,7 +127,7 @@ try {
 
     if ([IO.File]::Exists($publishFile) -or [IO.Directory]::Exists($installDirectory)) {
         $backupName = (Get-Date -Format 'yyyyMMdd-HHmmss') + '.' + [guid]::NewGuid().ToString('N')
-        $backupDirectory = Join-Path (Join-Path $addonsDirectory '.wps-json-get-backups') $backupName
+        $backupDirectory = Join-Path (Join-Path $addonsDirectory '.wps-tabbox-backups') $backupName
         [void][IO.Directory]::CreateDirectory($backupDirectory)
         if ([IO.File]::Exists($publishFile)) {
             [IO.File]::Copy($publishFile, (Join-Path $backupDirectory 'publish.xml'))

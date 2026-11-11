@@ -13,7 +13,7 @@
 
 1. 先编写本次独立的 PowerShell 验证，确认缺失脚本会失败。
 2. 实现安装器并验证首次安装、重复安装与备份、损坏配置保护；Windows 上额外验证只读配置导致失败时的恢复。
-3. 验证始终使用 WPS_JSON_GET_ADDONS_DIR 指向临时目录，清空 PATH，避免依赖 Git 或外部开发工具。
+3. 验证始终使用 WPS_TABBOX_ADDONS_DIR 指向临时目录，清空 PATH，避免依赖 Git 或外部开发工具。
 4. 在 Windows PowerShell 5.1 环境运行同一组验证，并验证独立脚本的 GitHub 下载路径。
 5. 更新 README 的 Windows 安装命令、路径、备份和验证说明，保留原 Mac 安装方式。
 6. 保留已有 .idea 编辑器改动，只提交本次安装器相关文件。真实 WPS 的注册及公式求值仍需用户验证。
@@ -23,5 +23,5 @@
 1. 已完成安装器、在线与离线安装说明，以及 Windows 自动验证流程。
 2. Windows PowerShell 5.1 的 7 项验证全部通过；验证使用临时目录和空 PATH，没有改动真实 WPS 配置。
 3. 已验证 GitHub 下载安装入口，包括 UTF-8 编码标记处理；其他加载项保留、原配置备份和最终替换失败恢复均通过。
-4. Windows 验证记录：https://github.com/jinsuojinsuo/wps-json-get/actions/runs/40257557783 。
+4. Windows 验证记录：https://github.com/jinsuojinsuo/wps-tabbox/actions/runs/40257557783 。
 5. 真实 WPS 客户端的加载和公式计算未验证，需安装后输入示例公式确认。
