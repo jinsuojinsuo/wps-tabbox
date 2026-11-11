@@ -8,7 +8,7 @@
     "node": ">=18"
   },
   "scripts": {
-    "test": "node --test tests/json-get.test.cjs tests/json-time.test.cjs tests/install-macos.test.cjs",
+    "test": "node --test tests/json-get.test.cjs tests/json-time.test.cjs tests/time-format.test.cjs tests/install-macos.test.cjs",
     "build": "node scripts/build.cjs",
     "wps:debug": "wpsjs debug --port 3893"
   },
