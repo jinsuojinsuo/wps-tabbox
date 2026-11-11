@@ -80,6 +80,10 @@
         }
     }
 
+    function padTimePart(value, width) {
+        return ("0000" + value).slice(-width);
+    }
+
     function time(timestamp, unit) {
         if (typeof timestamp === "string") {
             timestamp = timestamp.trim();
@@ -92,14 +96,17 @@
         if (unit === undefined || unit === null || unit === "") unit = "s";
         if (unit !== "s" && unit !== "ms") throw new Error('时间戳单位只支持 "s" 或 "ms"');
 
-        // 固定 UTC+8，再用 UTC 格式化，避免电脑时区及历史夏令时影响结果。
         var milliseconds = unit === "ms" ? timestamp : timestamp * 1000;
-        var date = new Date(milliseconds + 8 * 60 * 60 * 1000);
-        var year = date.getUTCFullYear();
+        var date = new Date(milliseconds);
+        // 本地日期方法使用该时间戳对应的系统时区规则，包含适用的夏令时。
+        var year = date.getFullYear();
         if (!Number.isFinite(year) || year < 1 || year > 9999) {
-            throw new Error("转换后的北京时间超出 0001–9999 年范围");
+            throw new Error("转换后的本机时间超出 0001–9999 年范围");
         }
-        return date.toISOString().slice(0, 19).replace("T", " ");
+        return padTimePart(year, 4) + "-" + padTimePart(date.getMonth() + 1, 2)
+            + "-" + padTimePart(date.getDate(), 2) + " " + padTimePart(date.getHours(), 2)
+            + ":" + padTimePart(date.getMinutes(), 2) + ":" + padTimePart(date.getSeconds(), 2)
+            + "." + padTimePart(date.getMilliseconds(), 3);
     }
 
     function timeFormula(timestamp, unit) {
@@ -131,7 +138,7 @@
     };
     var timeMetadata = {
         "name": "TIME",
-        "description": "将 Unix 时间戳转换为北京时间 yyyy-MM-dd HH:mm:ss 文本。",
+        "description": "将 Unix 时间戳转换为本机时区的 yyyy-mm-dd hh:mm:ss.000 文本。",
         "parameters": [
             {
                 "name": "timestamp",

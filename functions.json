@@ -21,7 +21,7 @@
     },
     {
       "name": "TIME",
-      "description": "将 Unix 时间戳转换为北京时间 yyyy-MM-dd HH:mm:ss 文本。",
+      "description": "将 Unix 时间戳转换为本机时区的 yyyy-mm-dd hh:mm:ss.000 文本。",
       "parameters": [
         {
           "name": "timestamp",
