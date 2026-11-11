@@ -80,10 +80,6 @@
         }
     }
 
-    function padTimePart(value, width) {
-        return ("0000" + value).slice(-width);
-    }
-
     function time(timestamp, unit) {
         if (typeof timestamp === "string") {
             timestamp = timestamp.trim();
@@ -103,10 +99,15 @@
         if (!Number.isFinite(year) || year < 1 || year > 9999) {
             throw new Error("转换后的本机时间超出 0001–9999 年范围");
         }
-        return padTimePart(year, 4) + "-" + padTimePart(date.getMonth() + 1, 2)
-            + "-" + padTimePart(date.getDate(), 2) + " " + padTimePart(date.getHours(), 2)
-            + ":" + padTimePart(date.getMinutes(), 2) + ":" + padTimePart(date.getSeconds(), 2)
-            + "." + padTimePart(date.getMilliseconds(), 3);
+        // 将本地年月日放入 UTC 容器，计算墙上时间对应的表格序列值。
+        // setUTCFullYear 避免 Date.UTC 把 0001–0099 年解释成 1901–1999 年。
+        var calendar = new Date(0);
+        calendar.setUTCFullYear(year, date.getMonth(), date.getDate());
+        calendar.setUTCHours(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds());
+        var serial = calendar.getTime() / 86400000 + 25569;
+        // 1900 日期系统保留了虚构的 1900-02-29，三月之前需扣除这一天。
+        if (calendar.getTime() < Date.UTC(1900, 2, 1)) serial -= 1;
+        return serial;
     }
 
     function timeFormula(timestamp, unit) {
@@ -138,7 +139,7 @@
     };
     var timeMetadata = {
         "name": "TIME",
-        "description": "将 Unix 时间戳转换为本机时区的 yyyy-mm-dd hh:mm:ss.000 文本。",
+        "description": "将 Unix 时间戳转换为本机时区的日期序列数值（1900 日期系统），单元格可设置日期格式。",
         "parameters": [
             {
                 "name": "timestamp",
@@ -152,7 +153,7 @@
             }
         ],
         "result": {
-            "type": "string"
+            "type": "any"
         }
     };
     var api = {
