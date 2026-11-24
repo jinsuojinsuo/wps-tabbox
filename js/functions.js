@@ -39,15 +39,18 @@
         if (typeof text !== "string") throw new Error("JSON 输入必须是文本");
         var value;
         try {
-            value = JSON.parse(text, function (key, item) {
-                if (typeof item === "number" && !Number.isFinite(item)) {
-                    throw new Error("数值超出范围，请使用字符串保存");
+            // 先校验原始语法，防止给数字加引号时把非法的数字字段名变成合法 JSON。
+            value = JSON.parse(text);
+            // 字符串整体跳过；长数字在正式取值前按原文保护，不能用已舍入的值转文本。
+            var protectedText = text.replace(/"(?:[^"\\]|\\.)*"|-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/g, function (token) {
+                if (token[0] === '"') return token;
+                var number = Number(token);
+                if (!Number.isFinite(number) || (Number.isInteger(number) && !Number.isSafeInteger(number))) {
+                    return JSON.stringify(token);
                 }
-                if (Number.isInteger(item) && !Number.isSafeInteger(item)) {
-                    throw new Error("数值超出安全整数范围，请在 JSON 中使用字符串保存长编号");
-                }
-                return item;
+                return token;
             });
+            if (protectedText !== text) value = JSON.parse(protectedText);
         } catch (error) {
             throw new Error("JSON 解析失败：" + error.message);
         }
